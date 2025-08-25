@@ -5,6 +5,7 @@ import './App.css'
 import { VerseSelector } from './components/VerseSelector';
 import { Output } from './components/Output';
 import { PrintableView } from './components/PrintableView';
+import logoUrl from './assets/logo.png';
 
 const API_URL = 'https://bibledata.atl1.cdn.digitaloceanspaces.com';
 const LANGUAGE = 'English';
@@ -100,8 +101,8 @@ export const App = () => {
 
     return (
         <div className='flex flex-col container'>
-            <div>
-                <h1>Re-Verse Bible Cypher</h1>
+            <div className='flex justify-center bg-gray-500 p-4 rounded-2xl'>
+                <img src={logoUrl} alt="logo" />
             </div>
             <div className='flex my-4'>
                 <div className='flex flex-col'>
