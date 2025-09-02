@@ -59,4 +59,5 @@ jobs:
                   username: ${{ secrets.SSH_USER }}
                   script: |
                       cd /var/www
+                      rm -rf re-verse_bible_cypher
                       git clone -b deploy --single-branch https://github.com/JustinHodge/re-verse_bible_cypher
