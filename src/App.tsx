@@ -29,12 +29,15 @@ export interface ITextData {
     verses: IVerse[];
 }
 
+interface ITOCEntry {
+    bookName: string;
+    bookNumber: number;
+    chapters: string[];
+    bookKey?: string;
+}
+
 interface ITableOfContents {
-    [key: string]: {
-        bookName: string;
-        bookNumber: number;
-        chapters: string[];
-    }
+    [key: string]: ITOCEntry
 }
 
 export type TPrintableView = 'puzzle' | 'key' | null;
@@ -50,12 +53,13 @@ export const App = () => {
     useEffect(() => {
         const fetchData = async () => {
             const tableOfContents = await fetch(makeURL(TOC_FILENAME));
-            const json = await tableOfContents.json();
-            const directory = Object.entries(json).reduce((acc, [key, value]) => {
-                acc[key] = { ...value, bookKey: key };
+            const json = await tableOfContents.json() as ITableOfContents;
+            const directory = Object.entries(json).reduce((acc: ITableOfContents, [key, value]: [string, ITOCEntry]) => {
+                console.log('key: ', key, ' -- value: ', value);
+                acc[key] = { ...(value as ITOCEntry), bookKey: key };
                 return acc;
             }, {} as ITableOfContents);
-            setDirectory(json);
+            setDirectory(directory);
         }
 
         fetchData();
