@@ -55,7 +55,6 @@ export const App = () => {
             const tableOfContents = await fetch(makeURL(TOC_FILENAME));
             const json = await tableOfContents.json() as ITableOfContents;
             const directory = Object.entries(json).reduce((acc: ITableOfContents, [key, value]: [string, ITOCEntry]) => {
-                console.log('key: ', key, ' -- value: ', value);
                 acc[key] = { ...(value as ITOCEntry), bookKey: key };
                 return acc;
             }, {} as ITableOfContents);
