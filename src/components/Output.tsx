@@ -60,8 +60,8 @@ export const Output = ({ selectedText, hideKey }: IProps) => {
                 {!hideKey ? (
                     <div id='key' className='flex border-b-2 border-gray-500 p-4 items-center justify-center'>
                         {Object.entries(encodingKey)
-                            .map(([key, value]) =>
-                                <div className='flex flex-col items-center justify-center mt-4'>
+                            .map(([key, value], index) =>
+                                <div key={`keychar${index}`} className='flex flex-col items-center justify-center mt-4'>
                                     <div className="w-5 h-lh">{codableCharacters.includes(key) ? '_' : key}</div>
                                     <div className="w-5 h-lh">{codableCharacters.includes(value) ? value : ' '}</div>
                                 </div>
@@ -70,9 +70,9 @@ export const Output = ({ selectedText, hideKey }: IProps) => {
                 ) : null
                 }
                 <div id='puzzle' className='flex p-4 flex-wrap'>
-                    {[...encodedText].map((char) => {
+                    {[...encodedText].map((char, index) => {
                         return (
-                            <div className='flex flex-col items-center justify-center mt-4 border-b-2 border-gray-500'>
+                            <div key={`puzzlechar${index}`} className='flex flex-col items-center justify-center mt-4 border-b-2 border-gray-500'>
                                 <div className="w-5 h-lh">{codableCharacters.includes(char) ? '_' : char}</div>
                                 <div className="w-5 h-lh">{codableCharacters.includes(char) ? char : ' '}</div>
                             </div>
