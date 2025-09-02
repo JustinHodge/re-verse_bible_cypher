@@ -10,7 +10,7 @@ import logoUrl from './assets/logo.png';
 const API_URL = 'https://bibledata.atl1.cdn.digitaloceanspaces.com';
 const LANGUAGE = 'English';
 const VERSION = 'CSBBible';
-const TOC_FILENAME = '00-TableOfContents.json';
+const TOC_FILENAME = '00_TableOfContents.json';
 
 const makeURL = (filepath: string) => {
     return `${API_URL}/${LANGUAGE}/${VERSION}/${filepath}`
@@ -41,7 +41,7 @@ export type TPrintableView = 'puzzle' | 'key' | null;
 
 export const App = () => {
     const [directory, setDirectory] = useState<ITableOfContents>();
-    const [book, setBook] = useState('');
+    const [bookKey, setBook] = useState('');
     const [chapter, setChapter] = useState('');
     const [verses, setVerses] = useState({ startVerse: -1, endVerse: -1 });
     const [textData, setTextData] = useState<ITextData | null>(null);
@@ -51,6 +51,10 @@ export const App = () => {
         const fetchData = async () => {
             const tableOfContents = await fetch(makeURL(TOC_FILENAME));
             const json = await tableOfContents.json();
+            const directory = Object.entries(json).reduce((acc, [key, value]) => {
+                acc[key] = { ...value, bookKey: key };
+                return acc;
+            }, {} as ITableOfContents);
             setDirectory(json);
         }
 
@@ -64,24 +68,24 @@ export const App = () => {
         }
 
         const fetchData = async () => {
-            const bookData = directory[book];
+            const bookData = directory[bookKey];
             const bookNumberString = bookData.bookNumber.toString().padStart(2, '0');
             const chapterString = chapter.toString().padStart(3, '0');
-            const chapterData = await fetch(makeURL(`${bookNumberString}_${bookData.bookName.replace(' ', '_')}/${bookData.bookName}_${chapterString}.json`));
+            const chapterData = await fetch(makeURL(`${bookNumberString}_${bookKey}/${bookKey}_${chapterString}.json`));
             const json = await chapterData.json();
             setTextData(json);
         }
 
         fetchData();
 
-    }, [chapter, book, directory])
+    }, [chapter, bookKey, directory])
 
     if (!directory) {
         return <p>Loading...</p>
     }
 
-    const books = Object.values(directory).map((book) => {
-        return book.bookName;
+    const books = Object.entries(directory).map(([key, value]) => {
+        return { bookName: value.bookName, bookNumber: value.bookNumber, bookKey: key }
     })
 
     const selectedText = textData
@@ -107,21 +111,21 @@ export const App = () => {
             <div className='flex my-4'>
                 <div className='flex flex-col'>
                     <label className='self-start mx-2' htmlFor='book'>Book: </label>
-                    <select className='border-2 border-gray-300 p-2 m-2 rounded-md' onChange={(e) => setBook(e.target.value)} value={book}>
+                    <select className='border-2 border-gray-300 p-2 m-2 rounded-md' onChange={(e) => setBook(e.target.value)} value={bookKey}>
                         <option value="" disabled>Select a book</option>
                         {books.map((book) => {
-                            return <option key={book} value={book}>{book}</option>
+                            return <option key={book.bookKey} value={book.bookKey}>{book.bookName}</option>
                         })}
                     </select>
                 </div>
                 {
-                    book ?
+                    bookKey ?
                         <ChapterSelector
                             className='border-2 border-gray-300 p-2 m-2 rounded-md'
                             value={chapter}
                             onChange={(e) => setChapter(e.target.value)}
-                            chapters={directory[book].chapters.map((chapter) => {
-                                return Number.parseInt(chapter.replace('.json', '').replace(`${book}_`, '')).toString();
+                            chapters={directory[bookKey].chapters.map((chapter) => {
+                                return Number.parseInt(chapter.replace('.json', '').replace(`${bookKey}_`, '')).toString();
                             })}
                         />
                         : null}
